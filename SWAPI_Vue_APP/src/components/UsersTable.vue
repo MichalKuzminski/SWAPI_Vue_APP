@@ -21,6 +21,12 @@
         </q-td>
       </template>
     </q-table>
+    <planet-dialog
+      v-if="planetDialogVisible"
+      :isOpen="planetDialogVisible"
+      :planetInfo="currentPlanetData"
+      @close="closeDialog"
+    />
   </div>
 </template>
 
@@ -29,6 +35,7 @@ import { defineComponent, onMounted, ref } from 'vue';
 import { useUsersStore } from 'src/stores/users-store';
 import { IUser, IPlanet } from 'src/types/types';
 import { getPlanetById } from 'src/api/swapi';
+import PlanetDialog from './PlanetDialog.vue';
 const columns = [
   {
     name: 'name',
@@ -54,9 +61,14 @@ const columns = [
 export default defineComponent({
   name: 'UsersTable',
   props: {},
+  components: {
+    PlanetDialog,
+  },
   setup() {
+    const planetDialogVisible = ref(false);
     const usersStore = useUsersStore();
     const rows = ref<IUser[]>([]);
+    const currentPlanetData = ref<IPlanet>({} as IPlanet);
     onMounted(async () => {
       await usersStore.getAllUsers();
       const users = usersStore.getUsers;
@@ -67,6 +79,9 @@ export default defineComponent({
 
     const showPlanetData = (planetInfo: IPlanet) => {
       console.error('aaa: ', planetInfo);
+      planetDialogVisible.value = true;
+      currentPlanetData.value = planetInfo;
+      console.error('planet value: ', planetDialogVisible.value);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parseRows = async (rows: any): Promise<IUser[]> => {
@@ -107,7 +122,19 @@ export default defineComponent({
         population: planet.population,
       };
     };
-    return { columns, rows, showPlanetData };
+
+    const closeDialog = () => {
+      planetDialogVisible.value = false;
+      currentPlanetData.value = {} as IPlanet;
+    };
+    return {
+      columns,
+      rows,
+      showPlanetData,
+      planetDialogVisible,
+      closeDialog,
+      currentPlanetData,
+    };
   },
 });
 </script>
