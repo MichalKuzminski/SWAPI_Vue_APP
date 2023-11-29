@@ -11,7 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <q-toolbar-title> Star Wars </q-toolbar-title>
 
         <div>author: Michał Kuźmiński</div>
       </q-toolbar>
