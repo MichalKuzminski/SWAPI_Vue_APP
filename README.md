@@ -4,6 +4,7 @@ Front-end developer assignment
 Some screenshots 
 
 ![1](https://github.com/MichalKuzminski/SWAPI_Vue_APP/assets/57454546/af67d239-1668-4e8b-a131-3024427a5306)
+(Image above is a gif with waiting stormtrooper ;) )
 
 ![2](https://github.com/MichalKuzminski/SWAPI_Vue_APP/assets/57454546/3b660f93-544d-4913-aafb-2ec66b4d662e)
 
