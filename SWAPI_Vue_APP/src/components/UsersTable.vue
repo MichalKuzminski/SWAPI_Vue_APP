@@ -1,37 +1,57 @@
 <template>
   <div class="q-pa-md">
-    <q-table
-      class="my-sticky-header-table"
-      flat
-      bordered
-      title="Users"
-      :rows="rows"
-      :columns="columns"
-      no-data-label="Loading..."
-      row-key="name"
-    >
-      <template v-slot:body-cell-planet="props">
-        <!-- Sprawdź, czy obecny wiersz to ostatni wiersz -->
-        <q-td
-          :props="props"
-          style="cursor: pointer"
-          @click="showPlanetData(props.row.planetInfo)"
-        >
-          {{ props.row.planet }}
-        </q-td>
-      </template>
-    </q-table>
-    <planet-dialog
-      v-if="planetDialogVisible"
-      :isOpen="planetDialogVisible"
-      :planetInfo="currentPlanetData"
-      @close="closeDialog"
-    />
+    <div style="border: 2px white solid" class="content-center" v-if="loading">
+      <img src="../assets/waiting.gif" style="text-align: center" />
+      <p style="color: yellow" class="text-h4 text-center">
+        Retrieving data from API, please wait...
+      </p>
+    </div>
+    <div v-else>
+      <q-table
+        class="my-sticky-header-table"
+        flat
+        bordered
+        dark
+        title="Users"
+        :rows="searchedName.length ? filteredRows : rows"
+        :columns="columns"
+        no-data-label="No data :("
+        row-key="name"
+      >
+        <template v-slot:body-cell-planet="props">
+          <q-td
+            :props="props"
+            style="cursor: pointer"
+            @click="showPlanetData(props.row.planetInfo)"
+          >
+            {{ props.row.planet }}
+          </q-td>
+        </template>
+      </q-table>
+      <q-input
+        class="q-mt-lg"
+        style="border: 1px yellow dotted"
+        dark
+        dense
+        placeholder="Search by name"
+        v-model="searchedName"
+      >
+        <template v-slot:append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <planet-dialog
+        v-if="planetDialogVisible"
+        :isOpen="planetDialogVisible"
+        :planetInfo="currentPlanetData"
+        @close="closeDialog"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { useUsersStore } from 'src/stores/users-store';
 import { IUser, IPlanet } from 'src/types/types';
 import { getPlanetById } from 'src/api/swapi';
@@ -65,23 +85,25 @@ export default defineComponent({
     PlanetDialog,
   },
   setup() {
+    const loading = ref<boolean>(false);
     const planetDialogVisible = ref(false);
     const usersStore = useUsersStore();
     const rows = ref<IUser[]>([]);
     const currentPlanetData = ref<IPlanet>({} as IPlanet);
+    const searchedName = ref<string>('');
+
     onMounted(async () => {
+      loading.value = true;
       await usersStore.getAllUsers();
       const users = usersStore.getUsers;
       const combined = await combinedData(users);
-      console.error('combined: ', combined);
       rows.value = await parseRows(combined);
+      loading.value = false;
     });
 
     const showPlanetData = (planetInfo: IPlanet) => {
-      console.error('aaa: ', planetInfo);
       planetDialogVisible.value = true;
       currentPlanetData.value = planetInfo;
-      console.error('planet value: ', planetDialogVisible.value);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const parseRows = async (rows: any): Promise<IUser[]> => {
@@ -91,8 +113,8 @@ export default defineComponent({
         rows.forEach((row: any) => {
           usersArray.push({
             name: row.name,
-            height: row.height,
-            mass: row.mass,
+            height: +row.height,
+            mass: +row.mass,
             created: row.created.split('T')[0],
             edited: row.edited.split('T')[0],
             planet: row.planetInfo.name,
@@ -103,6 +125,7 @@ export default defineComponent({
       return usersArray;
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const combinedData = async (rows: any) => {
       const combined: IUser[] = [];
       for (const row of rows) {
@@ -127,13 +150,25 @@ export default defineComponent({
       planetDialogVisible.value = false;
       currentPlanetData.value = {} as IPlanet;
     };
+
+    const filteredRows = computed(() => {
+      const searchName = searchedName.value.toLowerCase();
+      const filtered = rows.value.filter((row: IUser) =>
+        row.name.toLowerCase().includes(searchName)
+      );
+      return filtered;
+    });
+
     return {
+      loading,
       columns,
       rows,
       showPlanetData,
       planetDialogVisible,
       closeDialog,
       currentPlanetData,
+      searchedName,
+      filteredRows,
     };
   },
 });

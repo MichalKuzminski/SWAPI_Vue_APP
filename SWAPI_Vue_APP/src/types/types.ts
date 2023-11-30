@@ -1,7 +1,7 @@
 export interface IUser {
   name: string;
-  height: string;
-  mass: string;
+  height: number;
+  mass: number;
   created: string;
   edited: string;
   planet: string;

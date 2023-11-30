@@ -1,17 +1,69 @@
 <template>
   <q-dialog v-model="isOpenComputed" persistent>
-    <q-card class="my-card" style="width: 500px; height: 800px">
-      <img src="../assets/Tatooine.png" />
+    <q-card
+      class="q-pa-xs justify-center items-start content-center"
+      style="width: 350px; height: 600px; background-color: gray"
+    >
+      <!-- due to internal packages problem in my PC, I used this 'ugly' solution in order to display planets images  -->
+      <img
+        v-if="planetInfo?.name == 'Alderaan'"
+        src="../assets/Alderaan.png"
+        style="width: 350px; height: 300px"
+      />
+      <img
+        v-if="planetInfo?.name == 'Naboo'"
+        src="../assets/Naboo.png"
+        style="width: 350px; height: 300px"
+      />
+      <img
+        v-if="planetInfo?.name == 'Tatooine'"
+        src="../assets/Tatooine.png"
+        style="width: 350px; height: 300px"
+      />
+      <img
+        v-if="planetInfo?.name == 'Stewjon'"
+        src="../assets/Stewjon.png"
+        style="width: 350px; height: 300px"
+      />
 
       <q-card-section>
-        <p>Name: {{ planetInfo?.name }}</p>
-        <p>Diameter: {{ planetInfo?.diameter }}</p>
-        <p>Climate: {{ planetInfo?.climate }}</p>
-        <p>Population: {{ planetInfo?.population }}</p>
+        <div class="col q-gutter-y-md">
+          <div class="">
+            <q-badge class="q-mr-xs" color="black"
+              ><span style="color: yellow">Name:</span></q-badge
+            >
+            <b> {{ planetInfo?.name }} </b>
+          </div>
+          <div class="row">
+            <q-badge class="q-mr-xs" color="black"
+              ><span style="color: yellow">Diameter:</span></q-badge
+            >
+            <b> {{ planetInfo?.diameter }} </b>
+          </div>
+          <div class="row">
+            <q-badge class="q-mr-xs" color="black"
+              ><span style="color: yellow">Climate:</span></q-badge
+            >
+            <b> {{ planetInfo?.climate }} </b>
+          </div>
+          <div class="row">
+            <q-badge class="q-mr-xs" color="black"
+              ><span style="color: yellow">Population:</span></q-badge
+            >
+            <b> {{ planetInfo?.population }}</b>
+          </div>
+        </div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <q-btn label="close" @click="closeDialog"></q-btn>
+      <q-card-section class="q-pt-none justify-center">
+        <q-btn
+          color="black"
+          text-color="yellow"
+          style="border-radius: 15px"
+          class="full-width q-mt-xl"
+          label="close"
+          @click="closeDialog"
+        ></q-btn>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -19,10 +71,6 @@
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
 import { IPlanet } from 'src/types/types';
-import Alderaan from '../assets/Alderaan.png';
-import Naboo from '../assets/Naboo.png';
-import Tatooine from '../assets/Tatooine.png';
-import Stewjon from '../assets/Stewjon.png';
 
 export default defineComponent({
   name: 'PlanetDialog',
